@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Dino 2 JS</title>
+	<meta name="description content">
+	<meta name="viewport" >
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2 class="second">By Konstantinos Kousoulidis</h2>
+        
+		<div class="input">
+            <a href="/index.html">Home</a><br>
+            <a href="/other.html">Other Locations</a><br> 
+            <a href="/all.html">Useful Widgets</a>            
+            <br>
+           
+    <h1>Widgets</h1>
+
+    
+    <style>
+        .embed-container {position: relative; padding-bottom: 80%; height: 0; max-width: 100%;} 
+        .embed-container iframe, 
+        .embed-container object, 
+        .embed-container iframe{position: absolute; top: 0; left: 0; width: 100%; height: 100%;} 
+        small{position: absolute; z-index: 40; bottom: 0; margin-bottom: -15px;}
+        </style>
+        <div class="embed-container">
+            <iframe width="500" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" title="COVID-19" src="https://www.arcgis.com/apps/opsdashboard/index.html#/bda7594740fd40299423467b48e9ecf6"></iframe>
+         </div>
+         <a class="twitter-timeline" data-height="1500" data-dnt="true" data-theme="dark" href="https://twitter.com/se_covid19?ref_src=twsrc%5Etfw">Tweets by se_covid19</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>         <a href="https://twitter.com/se_covid19?ref_src=twsrc%5Etfw" class="twitter-follow-button" data-show-count="false">Follow @se_covid19</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+         <a href="https://twitter.com/intent/tweet?button_hashtag=se_covid19&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-show-count="false">Tweet #se_covid19</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script>
+        getData(); //makes a get request to the server (it's set by default in the fetch, so we don't need to specify it)
+        async function getData(){ // an async function awaits a the response
+            const response = await fetch('/all'); // I need to set a route called "/all" that hgandles a get request (is 'get' by default)
+            const data = await response.json(); //Need to define response in the  app.get function: response.json({...}); in the server
+            for (item of data){
+                    const root = document.createElement('p');
+                    const geo = document.createElement('div');
+                    const date = document.createElement('div');
+                    const myEntrance = document.createElement('div');
+                    
+                    geo.textContent = `${item.lat}°, ${item.lon}°`;                   
+                    const dateString = new Date(item.timestamp).toLocaleString();
+                    date.textContent = dateString;
+                    myEntrance.textContent = item.myInput;
+
+                    root.append(geo,date,myEntrance);
+                    document.body.append(root);
+                }
+            console.log(data);
+        }
+    </script>
+
+</body>
+
+</html>

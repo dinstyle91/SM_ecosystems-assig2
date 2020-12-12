@@ -1,0 +1,213 @@
+<!doctype html>  
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dino JS</title>
+		<meta name="description content">
+		<meta name="viewport" content="width-device-width">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+		<link rel="stylesheet" href="style.css">
+	</head>
+    <body>
+        <h2 class="second">By Konstantinos Kousoulidis</h2>
+        
+		<div class="input">
+            <a href="/index.html">Home</a><br>
+            <a href="/other.html">Other Locations</a><br> 
+            <a href="/all.html">Useful Widgets</a>            
+            <br>
+            <h1>Web Mashup for weather and coronavirus info by locations in Sweden</h1>
+        <p class="second"> Please enter an address or city, for instance: doktor forselius gata 54, or Stockholm </p>
+        <p class="second"> Please use 'a' instead of 'ä' or 'å' and 'o' instead of 'ö' </p>
+        <p class="second"> Valid entries can be: Vaxjo instead of Växjö or Goteborg instead of Göteborg </p>
+            <input type="text" placeholder="Enter s city" class="input_text">
+            <button id="search">Search</button>
+        </div>
+        
+        <script>
+            document.getElementById('search').addEventListener('click', event => {
+            
+                navigator.geolocation.getCurrentPosition(async position => { //we have it async so we can await further down, it was not well explained
+                    var input = document.querySelector('.input_text');
+                    const myInput = input.value;
+                    
+                    // new geolocation api
+                    const geolocation2_api_url = `/geolocation2/${myInput}`;
+                    const geolocation2_api_response = await fetch (geolocation2_api_url);
+                    const geolocation2_json_api_response = await  geolocation2_api_response.json(); 
+                    //console.log(geolocation2_json_api_response.data[0].latitude);
+                    var lat1 = geolocation2_json_api_response.data[0].latitude;
+                    var lon1 = geolocation2_json_api_response.data[0].longitude;
+                    var str = JSON.stringify(geolocation2_json_api_response.data[0].region);
+                    console.log(region);
+                    if (str.indexOf(' ') >= 0){
+                        var lastIndex = str.lastIndexOf(" ");
+                        str = str.substring(1)
+                        console.log('i went through the loop');
+                        var region11 = str.substring(0, lastIndex);
+                        var region = region11.slice(0, -1); 
+                    } else {
+                        console.log('i did not go through the loop');
+                        str = str.substring(1);
+                        str = str.slice(0, -1); 
+                        var region=str;
+                    }
+                    //console.log(region);
+
+
+                    // my weather api                    
+                    const weather_api_url = `/weather/${lat1},${lon1}`;
+                    const weather_api_response = await fetch (weather_api_url);
+                    const weather_json_api_response = await  weather_api_response.json(); 
+                    console.log(weather_json_api_response.main); 
+                    const tempValue = weather_json_api_response.main.temp;
+                    const feelsLike = weather_json_api_response.main.feels_like;
+                    const description = weather_json_api_response.weather[0].description;
+                    const root2 = document.createElement('p');
+                    const weatherInfo = document.createElement('div');
+                    weatherInfo.textContent = `Weather info: ${description} with a temperature of ${Math.round(tempValue-273)} °C which feels like ${Math.round(feelsLike-273)} °C`;
+                    root2.append(weatherInfo);
+                    document.body.append(root2);
+
+                    // Swedish Covid api                    
+                    const covid_api_url = `/seCovid/${region}`;
+                    const covid_api_response = await fetch (covid_api_url);
+                    const covid_json_api_response = await  covid_api_response.json(); 
+                    console.log(covid_json_api_response);
+                                       
+                    if (region=='Blekinge') {
+                        var g = 21;
+                    } else if (region=='Dalarna'){
+                        var g = 22;
+                    } else if (region=='Gotland'){
+                        var g = 23;
+                    }else if (region=='Gävleborg'){
+                        var g = 24;
+                    }else if (region=='Halland'){
+                        var g = 25;
+                    }else if (region=='Jämtland'){
+                        var g = 26;
+                    }else if (region=='Jönköping'){
+                        var g = 16;
+                    }else if (region=='Kalmar'){
+                        var g = 27;
+                    }else if (region=='Kronoberg'){
+                        var g = 28;
+                    }else if (region=='Norrbotten'){
+                        var g = 29;
+                    }else if (region=='Skåne'){
+                        var g = 14;
+                    }else if (region=='Stockholm'){
+                        var g = 30;
+                    }else if (region=='Södermanland'){
+                        var g = 31;
+                    }else if (region=='Uppsala'){
+                        var g = 32;
+                    }else if (region=='Värmland'){
+                        var g = 33;
+                    }else if (region=='Västerbotten'){
+                        var g = 34;
+                    }else if (region=='Västernorrland'){
+                        var g = 35;
+                    }else if (region=='Västmanland'){
+                        var g = 36;
+                    }else if (region=='Västra Götaland'){
+                        var g = 15;
+                    }else if (region=='Örebro'){
+                        var g = 37;
+                    }else if (region=='Östergötland'){
+                        var g = 38;
+                    }else {
+                        var g = 30;
+                    }
+                    
+                   
+                    console.log('the region in the news feed is: ')
+                    console.log(g);
+                    console.log(region);
+                    console.log(region=='"Kronoberg"');
+                    document.getElementById('settings-widget').setAttribute("src", `https://www.mynewsdesk.com/se/widget/view?query=Covid&amp;subject=&amp;g_region=${g}&amp;g_municipial=&amp;search_option=everything&amp;type_of_medias%5B%5D=news&amp;size=380_600&amp;heading=Coronavirus+${region}`); 
+                    
+                    
+                    
+                    //I will make a graph from my data
+                    var date = new Date();
+                    date.setDate(date.getDate() - 1);
+                    var dd = String(date.getDate()).padStart(2, '0');
+                    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = date.getFullYear();
+
+                    var today0 =  dd + '/' + mm + '/' + yyyy;
+                    var today1 = (dd-1) + '/' +  mm +  '/' + yyyy;
+                    var today2 = (dd-2) + '/' +  mm +  '/' + yyyy;
+                    var today3 = (dd-3) + '/' +  mm +  '/' + yyyy;
+                    var today4 = (dd-4) + '/' +  mm +  '/' + yyyy;
+                    var today5 = (dd-5) + '/' +  mm +  '/' + yyyy;
+
+                    var zero = String(today0);
+                    var one = String(today1);
+                    var two = String(today2);
+                    var three = String(today3);
+                    var four = String(today4);
+                    var five = String(today5);
+                    //console.log(today);
+
+                    date ; //# => Thu Mar 31 2011 11:14:50 GMT+0200 (CEST)
+                    var ctx = document.getElementById('chart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [zero, one, two, three, four, five],
+                            datasets: [{
+                                label: `# of new cases in: ${region}`,
+                                data: [covid_json_api_response[0],covid_json_api_response[1], covid_json_api_response[2], covid_json_api_response[3], covid_json_api_response[4], covid_json_api_response[5]],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+
+                });
+            
+               
+             
+            });       
+        </script>
+        <br/>
+        <!-- Just so that JSFiddle's Result label doesn't overlap the Chart -->
+        
+        <canvas id="chart" width="300" height="300"></canvas>
+        
+        <iframe id="settings-widget" src="" width="700" height="600" border="0" scroll="no" frameborder="0"></iframe>
+        <script>
+        </script>
+
+       
+        
+        
+    </body>	
+</html> 

@@ -1,0 +1,223 @@
+<!doctype html>  
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dino JS</title>
+		<meta name="description content">
+		<meta name="viewport" >
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+		<link rel="stylesheet" href="style.css">
+	</head>
+    <body>
+        
+        
+        <h2 class="second">By Konstantinos Kousoulidis</h2>
+		<div class="input">
+            <a href="/index.html">Home </a><br>
+            <a href="/other.html"> Other Locations </a> <br>
+            <a href="/all.html"> Useful Widgets </a>   <br>         
+            <br>
+            <h1>Web Mashup for weather and coronavirus info by locations in Sweden</h1>
+            <p>Push the button to view information about your area</p>
+            <button id="geolocate">geolocate</button>
+        </div>
+        
+        <script>
+            document.getElementById('geolocate').addEventListener('click', event => {
+            if('geolocation' in navigator) {
+                
+                navigator.geolocation.getCurrentPosition(async position => { //we have it async so we can await further down, it was not well explained
+                    const lon = position.coords.longitude; // assigning data from the api to variables
+                    const lat = position.coords.latitude;
+                    
+                    const geoData = {lat, lon}; // I will send this to the backend with a post
+                    const options = {// This is the second argument that is needed in a post function
+                        method: 'POST', //we need to specify what type of function we have
+                        headers: { //not really sure, i think again we say that the data are going to be json format
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(geoData) // we are converting the data in to a json format
+                    }; 
+                    const response = await fetch('/api', options); //this is the response from the back end after fetch is done
+                    const jsonData = await response.json(); // not sure what's hapening with the awaits, but we are structuring the response
+                    //console.log(jsonData);
+
+                    // my geolocation api
+                    const api_url = '/geolocation';
+                    const api_response = await fetch (api_url);
+                    const json_api_response = await  api_response.json(); 
+                    const region = json_api_response.region_name;
+                    //const region = 'Stockholm';
+                    const city = json_api_response.city;
+                    const lat1 = json_api_response.latitude;
+                    const lon1 = json_api_response.longitude;
+                    //console.log(region,city,lat1,lon1); 
+                    //console.log('Comparing region');
+                    //console.log(region);
+                    //console.log(region=='Västra Götaland');
+
+                    // my weather api                    
+                    const weather_api_url = `/weather/${lat1},${lon1}`;
+                    const weather_api_response = await fetch (weather_api_url);
+                    const weather_json_api_response = await  weather_api_response.json(); 
+                    //console.log(weather_json_api_response.weather[0].description); 
+                    const tempValue = weather_json_api_response.main.temp;
+                    const feelsLike = weather_json_api_response.main.feels_like;
+                    const nameValue = weather_json_api_response.main.name;
+                    const description = weather_json_api_response.weather[0].description;
+                    const root2 = document.createElement('p');
+                    const weatherInfo = document.createElement('div');
+                    weatherInfo.textContent = `Weather info: ${description} with a temperature of ${Math.round(tempValue-273)} °C which feels like ${Math.round(feelsLike-273)} °C`;
+                    root2.append(weatherInfo);
+                    document.body.append(root2);  
+
+
+                    // Swedish Covid api                    
+                    const covid_api_url = `/seCovid/${region}`;
+                    const covid_api_response = await fetch (covid_api_url);
+                    const covid_json_api_response = await  covid_api_response.json(); 
+                    //console.log(covid_json_api_response);
+                    var i;
+                    //for (i = 0; i < covid_json_api_response.length; i++) {
+                    //    const root = document.createElement('p');
+                    //    const cases = document.createElement('div');
+                    //    cases.textContent = `New cases in ${region} ${i} days ago: ${covid_json_api_response[i]}`;
+                    //    root.append(cases);
+                    //    document.body.append(root);    
+                    //} 
+                   
+                    if (region=='Blekinge') {
+                        var g = 21;
+                    } else if (region=='Dalarna'){
+                        var g = 22;
+                    } else if (region=='Gotland'){
+                        var g = 23;
+                    }else if (region=='Gävleborg'){
+                        var g = 24;
+                    }else if (region=='Halland'){
+                        var g = 25;
+                    }else if (region=='Jämtland'){
+                        var g = 26;
+                    }else if (region=='Jönköping'){
+                        var g = 16;
+                    }else if (region=='Kalmar'){
+                        var g = 27;
+                    }else if (region=='Kronoberg'){
+                        var g = 28;
+                    }else if (region=='Norrbotten'){
+                        var g = 29;
+                    }else if (region=='Skåne'){
+                        var g = 14;
+                    }else if (region=='Stockholm'){
+                        var g = 30;
+                    }else if (region=='Södermanland'){
+                        var g = 31;
+                    }else if (region=='Uppsala'){
+                        var g = 32;
+                    }else if (region=='Värmland'){
+                        var g = 33;
+                    }else if (region=='Västerbotten'){
+                        var g = 34;
+                    }else if (region=='Västernorrland'){
+                        var g = 35;
+                    }else if (region=='Västmanland'){
+                        var g = 36;
+                    }else if (region=='Västra Götaland'){
+                        var g = 15;
+                    }else if (region=='Örebro'){
+                        var g = 37;
+                    }else if (region=='Östergötland'){
+                        var g = 38;
+                    }else {
+                        var g = 30;
+                    }
+                    document.getElementById('settings-widget').setAttribute("src", `https://www.mynewsdesk.com/se/widget/view?query=Covid&amp;subject=&amp;g_region=${g}&amp;g_municipial=&amp;search_option=everything&amp;type_of_medias%5B%5D=news&amp;size=380_600&amp;heading=Coronavirus+${city}`); 
+                    
+                    
+                    // twitter api                    
+                    const twitter_api_url = `/twitter/${lat1},${lon1}`;
+                    const twitter_api_response = await fetch (twitter_api_url); // unfortunately I am unable to form a response from Twitter
+                    //const twitter_json_api_response = await  twitter_api_response.json(); 
+                    //console.log(twitter_json_api_response); 
+                    
+                    //I will make a graph from my data
+                    var date = new Date();
+                    date.setDate(date.getDate() - 1);
+                    var dd = String(date.getDate()).padStart(2, '0');
+                    var mm = String(date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                    var yyyy = date.getFullYear();
+
+                    var today0 =  dd + '/' + mm + '/' + yyyy;
+                    var today1 = (dd-1) + '/' +  mm +  '/' + yyyy;
+                    var today2 = (dd-2) + '/' +  mm +  '/' + yyyy;
+                    var today3 = (dd-3) + '/' +  mm +  '/' + yyyy;
+                    var today4 = (dd-4) + '/' +  mm +  '/' + yyyy;
+                    var today5 = (dd-5) + '/' +  mm +  '/' + yyyy;
+
+                    var zero = String(today0);
+                    var one = String(today1);
+                    var two = String(today2);
+                    var three = String(today3);
+                    var four = String(today4);
+                    var five = String(today5);
+                    //console.log(today);
+
+                    date ; //# => Thu Mar 31 2011 11:14:50 GMT+0200 (CEST)
+                    var ctx = document.getElementById('chart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: [zero, one, two, three, four, five],
+                            datasets: [{
+                                label: `# of new cases in: ${region}`,
+                                data: [covid_json_api_response[0],covid_json_api_response[1], covid_json_api_response[2], covid_json_api_response[3], covid_json_api_response[4], covid_json_api_response[5]],
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.2)',
+                                    'rgba(54, 162, 235, 0.2)',
+                                    'rgba(255, 206, 86, 0.2)',
+                                    'rgba(75, 192, 192, 0.2)',
+                                    'rgba(153, 102, 255, 0.2)',
+                                    'rgba(255, 159, 64, 0.2)'
+                                ],
+                                borderColor: [
+                                    'rgba(255, 99, 132, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(153, 102, 255, 1)',
+                                    'rgba(255, 159, 64, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+
+                });
+            } else {
+                console.log("Mozilla Geolocation is not available");
+            } 
+            });       
+        </script>
+        <br/>
+        <!-- Just so that JSFiddle's Result label doesn't overlap the Chart -->
+        
+        <canvas id="chart" width="300" height="300"></canvas>
+        
+        <iframe id="settings-widget" src="" width="700" height="600" border="0" scroll="no" frameborder="0"></iframe>
+        <script>
+        </script>
+
+       
+        
+        
+    </body>	
+</html>

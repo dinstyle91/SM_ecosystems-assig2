@@ -1,0 +1,27 @@
+{
+  "name": "ecosystems-node",
+  "version": "1.0.0",
+  "description": "First attempt using node.js to serve my website. Hoping to integrate a proxy service for my API use.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "social",
+    "media",
+    "ecosystems",
+    "node",
+    "mashup"
+  ],
+  "author": "Konstantinos Kousoulidis",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "express": "^4.17.1",
+    "franc": "^5.0.0",
+    "nedb": "^1.8.0",
+    "node-fetch": "^2.6.1",
+    "open": "^7.3.0",
+    "twit": "^2.2.11"
+  }
+}
