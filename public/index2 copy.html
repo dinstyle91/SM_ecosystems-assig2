@@ -1,0 +1,57 @@
+<!doctype html>  
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Dino JS</title>
+		<meta name="description content">
+		<meta name="viewport" content="width-device-width">
+    
+		<link rel="stylesheet" href="style.css">
+	</head>
+    <body>
+               
+        <p class="second"> My Functionality</p>       
+       
+        <script>
+        if('geolocation' in navigator) {
+           console.log("Mozilla Geolocation is available");
+           navigator.geolocation.getCurrentPosition(async position => { //we have it async so we can await further down, it was not well explained
+            
+            const lon = position.coords.longitude; // assigning data from the api to variables
+            const lat = position.coords.latitude;
+            const geoData = {lat, lon}; // I will send this to the backend with a post
+            const options = {// This is the second argument that is needed in a post function
+                method: 'POST', //we need to specify what type of function we have
+                headers: { //not really sure, i think again we say that the data are going to be json format
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(geoData) // we are converting the data in to a json format
+            }; 
+            const response = await fetch('/api', options); //this is the response from the back end after fetch is done
+            const jsonData = await response.json(); // not sure what's hapening with the awaits, but we are structuring the response
+            console.log(jsonData);
+           });
+        } else {
+            console.log("Mozilla Geolocation is not available");
+          }
+        </script>
+
+        <script> // with this script we are querying geolocation data from the server
+            queryDbData(); 
+            async function queryDbData() { // there something about the "async" and "await", i think that they are linked somehow.
+                const response = await fetch ('/myrequest');
+                const data = await response.json();
+                const root = document.createElement('div');
+                const geo = document.createElement('div');
+                const date = document.createElement('div');   
+                console.log(data.status);                 
+                geo.textContent = `My location is: ${data.latitude}°, ${data.longtitude}°`;
+                const dateString = new Date(data.timestamp).toLocaleString();
+                date.textContent =  `Date and time: ${dateString} `;
+
+                root.append(geo,date);
+                document.body.append(root);                
+            }
+        </script>
+    </body>	
+</html>
