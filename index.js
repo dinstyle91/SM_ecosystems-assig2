@@ -5,6 +5,7 @@ const Twit = require('twit')
 //const notifier = require('node-notifier');
 const open = require('open');
 const franc = require('franc')
+require ('dotenv').config();
 
 const app = express(); // this is the application which can listen
 const database = new Datastore('database.db'); // this can just be an array too? const database = [];
@@ -158,7 +159,7 @@ app.get ('/seCovid/:region', async (request,response) => { //my server will retr
       
 });
 app.get ('/twitter/:latlon', async (request,response) => { //my server will retrieve data from the twitter api
-    const apikey = '8XXJHFRURVsUHbDAlefwXRPC6'
+    const apikey = process.env.API_KEY
     const apiSecretKey = '1brtOdwR4uKZ1jznvt4dSRntjUa79Iu5Y41XiFKaJq7kHE4gJm'
     const accessToken = '1092534610796441600-8pY431ZPTkPErnx22WHtElQCxnDDpu'
     const accessTokenSecret = 'DicfEUovlNVWlstuEdQ3QXEyApCvgNvMGUR7aplAe2htm'
